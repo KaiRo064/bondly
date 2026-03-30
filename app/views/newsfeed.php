@@ -1,43 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Bondly | Home</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50">
-    <nav class="bg-white border-b p-4 shadow-sm">
-        <div class="max-w-2xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-black text-pink-500">Bondly.</h1>
-            <div class="flex items-center space-x-4">
-                <span class="text-sm font-bold">
-                    Hi, <?= isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User' ?>!
-                </span>
-                <a href="index.php?page=logout" class="text-xs font-bold text-gray-400 hover:text-red-500">LOGOUT</a>
-            </div>
-        </div>
-    </nav>
+<?php include 'layout/header.php'; ?>
 
-    <main class="max-w-xl mx-auto py-8">
-        <div class="bg-white p-5 rounded-2xl border mb-8">
-            <form action="index.php?page=post_action" method="POST">
-                <textarea name="content" placeholder="Share a moment..." class="w-full border-none focus:ring-0 text-lg resize-none" required></textarea>
-                <div class="text-right border-t pt-2">
-                    <button class="bg-pink-500 text-white px-6 py-2 rounded-full font-bold">Post</button>
+<div class="main-layout">
+    <aside>
+        <div class="glass-card">
+            <h3 style="margin-top:0">Create Post</h3>
+            <form action="index.php?action=create_post" method="POST" enctype="multipart/form-data">
+                <textarea name="content" placeholder="Kya soch rahe ho?" style="height: 120px;" required></textarea>
+                <div style="margin: 15px 0;">
+                    <input type="file" name="post_image" style="font-size: 0.8rem; color: var(--text-muted);">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn-blue" style="flex: 1;">Post</button>
+                    <button type="reset" class="btn-blue" style="background:#334155; flex: 1;">Clear</button>
                 </div>
             </form>
+            <p style="font-size: 0.7rem; color: #64748b; margin-top: 15px;">Note: Data browser ke localStorage me save hota hai.</p>
         </div>
 
-        <?php if (!empty($posts)): ?>
-            <?php foreach ($posts as $post): ?>
-                <div class="bg-white border rounded-2xl mb-4 p-4 shadow-sm">
-                    <p class="font-bold text-sm mb-2"><?= htmlspecialchars($post['username']) ?></p>
-                    <p class="text-gray-800"><?= htmlspecialchars($post['content']) ?></p>
+        <div class="glass-card">
+            <h3 style="margin-top:0">Find People</h3>
+            <input type="text" id="userSearch" placeholder="Search Person...">
+            <div id="searchResults" style="margin-top:10px;"></div>
+        </div>
+    </aside>
+
+    <main>
+        <div class="glass-card" style="display: flex; gap: 10px; align-items: center; padding: 12px 20px;">
+            <input type="text" placeholder="Search posts..." style="flex:1">
+            <select style="background:#0f172a; color:white; border:1px solid #334155; padding:8px; border-radius:6px;">
+                <option>Latest First</option>
+            </select>
+            <span style="color: var(--text-muted); font-size: 0.9rem;">Posts: <?= count($posts) ?></span>
+        </div>
+
+        <?php foreach ($posts as $post): ?>
+            <div class="glass-card">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                    <div style="background: #f59e0b; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                        <?= strtoupper($post['full_name'][0]) ?>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;"><?= htmlspecialchars($post['full_name']) ?></div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);"><?= date('d/m/Y, H:i:s', strtotime($post['created_at'])) ?></div>
+                    </div>
+                    <div style="margin-left: auto;">
+                        <button style="background: #22c55e; color: white; border: none; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem;">Liked (<?= $post['like_count'] ?>)</button>
+                    </div>
                 </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="text-center text-gray-400 py-10">No posts yet. Start the conversation!</div>
-        <?php endif; ?>
+
+                <p style="line-height: 1.6;"><?= nl2br(htmlspecialchars($post['content'])) ?></p>
+
+                <?php if($post['image']): ?>
+                    <img src="assets/uploads/posts/<?= $post['image'] ?>" style="width: 100%; border-radius: 8px; border: 1px solid #334155; margin-top: 10px;">
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
     </main>
-</body>
-</html>
+</div>
+
+<?php include 'layout/footer.php'; ?>

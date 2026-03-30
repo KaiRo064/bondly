@@ -1,72 +1,31 @@
 <?php
-// PROBLEM 1: SESSION NOT INITIALIZED SAFELY
-// We add a check to ensure sessions only start if one isn't already active.
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../app/controllers/AuthController.php';
+require_once __DIR__ . '/../app/controllers/PostController.php';
 
-require_once '../config/database.php';
-require_once '../app/controllers/AppController.php';
+$db = (new Database())->connect();
+$action = $_GET['action'] ?? 'login';
 
-// PROBLEM 2: CALLING METHODS ON A NULL OBJECT
-// If the database connection fails, (new Database())->getConnection() returns null.
-// We must check if $db exists before giving it to the Controller.
-$database = new Database();
-$db = $database->getConnection();
+$action = $_GET['action'] ?? 'login';
 
-if (!$db) {
-    die("Connection Error: Please ensure 'bondly_db' exists in phpMyAdmin.");
-}
+switch ($action) {
+    // Auth
+    case 'login':           include __DIR__ . '/../app/views/auth/login.php'; break;
+    case 'login_submit':    $authCtrl->login(); break;
+    case 'register':        include __DIR__ . '/../app/views/auth/register.php'; break;
+    case 'register_submit': $authCtrl->register(); break;
+    case 'logout':          $authCtrl->logout(); break;
 
-$ctrl = new AppController($db);
-$page = $_GET['page'] ?? 'login';
+    // Profile
+    case 'profile':         (new ProfileController($db))->index(); break;
+    case 'update_profile':  (new ProfileController($db))->update(); break;
 
-// Security: Redirect logged-in users away from Login/Register
-if (isset($_SESSION['user_id']) && ($page == 'login' || $page == 'register')) {
-    header("Location: index.php?page=newsfeed");
-    exit();
-}
+    // Posts
+    case 'newsfeed':        $postCtrl->index(); break;
+    case 'create_post':     $postCtrl->store(); break;
+    case 'delete_post':     $postCtrl->delete(); break;
+    case 'like':            $postCtrl->like(); break;
 
-// Security: Redirect guests away from Newsfeed
-$public = ['login', 'register', 'login_action', 'register_action'];
-if (!isset($_SESSION['user_id']) && !in_array($page, $public)) {
-    header("Location: index.php?page=login");
-    exit();
-}
-
-// PROBLEM 3: UNDEFINED ACTIONS IN THE SWITCH
-// Ensure every case matches a method that actually exists in your AppController.
-switch ($page) {
-    case 'login': 
-        include '../app/views/login.php'; 
-        break;
-    case 'register': 
-        include '../app/views/register.php'; 
-        break;
-    case 'login_action': 
-        $ctrl->loginAction(); 
-        break;
-    case 'register_action': 
-        $ctrl->registerAction(); 
-        break;
-    case 'newsfeed': 
-        $ctrl->showFeed(); 
-        break;
-    case 'post_action': 
-        $ctrl->createPostAction(); 
-        break;
-    case 'like': 
-        $ctrl->likeAction(); 
-        break;
-    case 'comment_action': 
-        $ctrl->commentAction(); 
-        break;
-    case 'logout':
-        session_unset();
-        session_destroy();
-        header("Location: index.php?page=login");
-        exit();
-    default: 
-        header("Location: index.php?page=newsfeed"); 
-        break;
+    default:                header("Location: index.php?action=login"); break;
 }
