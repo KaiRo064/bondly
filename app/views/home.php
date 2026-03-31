@@ -20,7 +20,7 @@
                                 <a href="<?php echo BASE_URL; ?>index.php?page=profile&user=<?php echo sanitize($post['username']); ?>" class="post-username" style="display: block; word-break: break-word;">
                                     <?php echo sanitize($post['fullname']); ?>
                                 </a>
-                                <span class="post-time">@<?php echo sanitize($post['username']); ?> • <?php echo timeAgo($post['created_at']); ?></span>
+                                <span class="post-time">@<?php echo sanitize($post['username']); ?></span>
                             </div>
                         </div>
                         
@@ -64,9 +64,9 @@
                     </div>
 
                     <!-- Comments Section -->
-                    <?php if (!empty($post['comments'])): ?>
-                        <div class="comments-section">
-                            <h6 style="margin-bottom: 16px; color: rgba(224, 231, 255, 0.8); font-size: 0.95rem;">Comments</h6>
+                    <div id="comments-section-<?php echo $post['id']; ?>" class="comments-section" style="margin-top: 16px;">
+                        <h6 style="margin-bottom: 12px; color: rgba(224, 231, 255, 0.8); font-size: 0.95rem;">Comments</h6>
+                        <?php if (!empty($post['comments'])): ?>
                             <?php foreach ($post['comments'] as $comment): ?>
                                 <div class="comment">
                                     <div class="comment-avatar" style="flex-shrink: 0;">
@@ -81,8 +81,6 @@
                                             <a href="<?php echo BASE_URL; ?>index.php?page=profile&user=<?php echo sanitize($comment['username']); ?>" class="comment-user">
                                                 <?php echo sanitize($comment['fullname']); ?>
                                             </a>
-                                            <span class="comment-time"><?php echo timeAgo($comment['created_at']); ?></span>
-                                            
                                             <?php if ($comment['user_id'] == getCurrentUserId()): ?>
                                                 <button onclick="deleteComment(<?php echo $comment['id']; ?>)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.75rem; padding: 0; margin-left: auto;">
                                                     Delete
@@ -93,23 +91,25 @@
                                     </div>
                                 </div>
                             <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
+                        <?php else: ?>
+                            <div style="color: rgba(224, 231, 255, 0.7); font-size: 0.9rem; margin-bottom: 8px;">No comments yet. Be the first to comment.</div>
+                        <?php endif; ?>
+                    </div>
 
                     <!-- Add Comment Form -->
                     <div id="comment-form-<?php echo $post['id']; ?>" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
                         <form onsubmit="return addComment(<?php echo $post['id']; ?>, this)">
-                            <div style="display: flex; gap: 8px; flex-direction: row;">
-                                <input 
-                                    type="text" 
-                                    name="comment" 
-                                    placeholder="Add a comment..." 
-                                    class="form-control glass-input" 
-                                    style="flex: 1; min-width: 0;"
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <input
+                                    type="text"
+                                    name="comment"
+                                    placeholder="Add a comment..."
+                                    class="form-control glass-input"
+                                    style="flex: 1; min-width: 0; height: 48px; font-size: 1rem;"
                                     required
                                 >
-                                <button type="submit" class="btn btn-primary" style="flex-shrink: 0; padding: 10px 16px;">
-                                    <i class="fas fa-paper-plane"></i>
+                                <button type="submit" class="btn btn-primary" style="flex-shrink: 0; width: 56px; height: 48px; padding: 0; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-paper-plane" style="line-height: 1; margin: 0;"></i>
                                 </button>
                             </div>
                         </form>

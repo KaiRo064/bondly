@@ -6,16 +6,19 @@
 
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Post.php';
+require_once __DIR__ . '/../models/Comment.php';
 
 class UserController {
     private $pdo;
     private $user_model;
     private $post_model;
+    private $comment_model;
 
     public function __construct($pdo) {
         $this->pdo = $pdo;
         $this->user_model = new User($pdo);
         $this->post_model = new Post($pdo);
+        $this->comment_model = new Comment($pdo);
     }
 
     /**
@@ -38,6 +41,11 @@ class UserController {
 
         // Get user's posts
         $posts = $this->post_model->getUserPosts($user['id']);
+
+        // Attach comments to each post for profile view
+        foreach ($posts as &$post) {
+            $post['comments'] = $this->comment_model->getPostComments($post['id']);
+        }
 
         // Get user stats
         $posts_count = $this->user_model->getPostsCount($user['id']);

@@ -85,9 +85,9 @@
                             </p>
 
                             <!-- Post Stats -->
-                            <div style="display: flex; justify-content: space-between; color: rgba(224, 231, 255, 0.6); font-size: 0.875rem; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                                <span><i class="fas fa-heart"></i> <?php echo $post['likes_count']; ?> Likes</span>
-                                <span><i class="fas fa-comment"></i> <?php echo $post['comments_count']; ?> Comments</span>
+                            <div class="post-actions" style="display: flex; justify-content: space-between; color: rgba(224, 231, 255, 0.6); font-size: 0.875rem; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                                <span><i class="fas fa-heart"></i> <span class="likes-count"><?php echo $post['likes_count']; ?></span> Likes</span>
+                                <span><i class="fas fa-comment"></i> <span class="comments-count"><?php echo $post['comments_count']; ?></span> Comments</span>
                             </div>
 
                             <!-- Action Button -->

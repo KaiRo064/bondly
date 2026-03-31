@@ -28,11 +28,22 @@ class PostController {
         requireLogin();
         
         $posts = $this->post_model->getAllPosts(10000, 0); // Get all posts
-        
+
+        // Deduplicate any posts by ID (defensive, protects against repeat rows in joins)
+        $uniquePosts = [];
+        $seenPostIds = [];
+        foreach ($posts as $singlePost) {
+            if (!isset($seenPostIds[$singlePost['id']])) {
+                $seenPostIds[$singlePost['id']] = true;
+                $uniquePosts[] = $singlePost;
+            }
+        }
+        $posts = $uniquePosts;
+
         // Add like and comment info for each post
-        foreach ($posts as &$post) {
-            $post['liked'] = $this->like_model->hasLiked($post['id'], getCurrentUserId());
-            $post['comments'] = $this->comment_model->getPostComments($post['id']);
+        foreach ($posts as $index => $post) {
+            $posts[$index]['liked'] = $this->like_model->hasLiked($post['id'], getCurrentUserId());
+            $posts[$index]['comments'] = $this->comment_model->getPostComments($post['id']);
         }
 
         require __DIR__ . '/../views/home.php';
@@ -150,7 +161,19 @@ class PostController {
             $result = $this->comment_model->addComment($post_id, getCurrentUserId(), $comment_text);
             
             header('Content-Type: application/json');
-            echo json_encode($result);
+            if ($result['success']) {
+                $lastComment = $this->comment_model->getLastComment($post_id);
+                $post = $this->post_model->getPostById($post_id);
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Comment added successfully',
+                    'comment' => $lastComment,
+                    'comments_count' => $post ? $post['comments_count'] : null,
+                ]);
+            } else {
+                echo json_encode($result);
+            }
         }
         exit;
     }

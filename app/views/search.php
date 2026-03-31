@@ -95,7 +95,7 @@
                                         <a href="<?php echo BASE_URL; ?>index.php?page=profile&user=<?php echo sanitize($post['username']); ?>" class="post-username">
                                             <?php echo sanitize($post['fullname']); ?>
                                         </a>
-                                        <span class="post-time">@<?php echo sanitize($post['username']); ?> • <?php echo timeAgo($post['created_at']); ?></span>
+                                        <span class="post-time">@<?php echo sanitize($post['username']); ?></span>
                                     </div>
                                 </div>
                             </div>

@@ -34,11 +34,13 @@ class Post {
     public function getAllPosts($limit = 20, $offset = 0) {
         try {
             $stmt = $this->pdo->prepare(
-                'SELECT p.id, p.user_id, p.title, p.content, p.image, p.likes_count, p.comments_count, p.created_at,
-                        u.fullname, u.username, u.profile_picture
+                'SELECT DISTINCT p.id, p.user_id, p.title, p.content, p.image, p.likes_count, p.comments_count, p.created_at,
+                        COALESCE(u.fullname, "Unknown") AS fullname,
+                        COALESCE(u.username, "deleted_user") AS username,
+                        COALESCE(u.profile_picture, "default-avatar.png") AS profile_picture
                  FROM posts p
-                 JOIN users u ON p.user_id = u.id
-                 ORDER BY p.created_at DESC
+                 LEFT JOIN users u ON p.user_id = u.id
+                 ORDER BY p.created_at DESC, p.id DESC
                  LIMIT ? OFFSET ?'
             );
             $stmt->execute([$limit, $offset]);
@@ -55,11 +57,13 @@ class Post {
         try {
             $stmt = $this->pdo->prepare(
                 'SELECT p.id, p.user_id, p.title, p.content, p.image, p.likes_count, p.comments_count, p.created_at,
-                        u.fullname, u.username, u.profile_picture
+                        COALESCE(u.fullname, "Unknown") AS fullname,
+                        COALESCE(u.username, "deleted_user") AS username,
+                        COALESCE(u.profile_picture, "default-avatar.png") AS profile_picture
                  FROM posts p
-                 JOIN users u ON p.user_id = u.id
+                 LEFT JOIN users u ON p.user_id = u.id
                  WHERE p.user_id = ?
-                 ORDER BY p.created_at DESC
+                 ORDER BY p.created_at DESC, p.id DESC
                  LIMIT ? OFFSET ?'
             );
             $stmt->execute([$user_id, $limit, $offset]);

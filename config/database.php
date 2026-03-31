@@ -86,23 +86,47 @@ function formatDate($date) {
 }
 
 /**
- * Helper function to calculate time ago
+ * Helper function to calculate “time ago” label
  */
 function timeAgo($datetime) {
     $time = strtotime($datetime);
+    if ($time === false || $time <= 0) {
+        return 'Unknown time';
+    }
+
     $current_time = time();
     $time_difference = $current_time - $time;
-    
-    if ($time_difference < 60) {
-        return $time_difference . ' seconds ago';
-    } else if ($time_difference < 3600) {
-        return round($time_difference / 60) . ' minutes ago';
-    } else if ($time_difference < 86400) {
-        return round($time_difference / 3600) . ' hours ago';
-    } else if ($time_difference < 604800) {
-        return round($time_difference / 86400) . ' days ago';
-    } else {
-        return date('M d, Y', $time);
+
+    if ($time_difference < 0) {
+        $time_difference = abs($time_difference);
+
+        if ($time_difference < 60) {
+            return 'in ' . $time_difference . ' seconds';
+        } elseif ($time_difference < 3600) {
+            $minutes = round($time_difference / 60);
+            return 'in ' . $minutes . ' minute' . ($minutes === 1 ? '' : 's');
+        } elseif ($time_difference < 86400) {
+            $hours = round($time_difference / 3600);
+            return 'in ' . $hours . ' hour' . ($hours === 1 ? '' : 's');
+        } else {
+            $days = round($time_difference / 86400);
+            return 'in ' . $days . ' day' . ($days === 1 ? '' : 's');
+        }
     }
+
+    if ($time_difference < 60) {
+        return $time_difference . ' second' . ($time_difference === 1 ? '' : 's') . ' ago';
+    } elseif ($time_difference < 3600) {
+        $minutes = round($time_difference / 60);
+        return $minutes . ' minute' . ($minutes === 1 ? '' : 's') . ' ago';
+    } elseif ($time_difference < 86400) {
+        $hours = round($time_difference / 3600);
+        return $hours . ' hour' . ($hours === 1 ? '' : 's') . ' ago';
+    } elseif ($time_difference < 604800) {
+        $days = round($time_difference / 86400);
+        return $days . ' day' . ($days === 1 ? '' : 's') . ' ago';
+    }
+
+    return date('M d, Y \a\t H:i', $time);
 }
 ?>

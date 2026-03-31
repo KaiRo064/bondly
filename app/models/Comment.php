@@ -56,6 +56,27 @@ class Comment {
     }
 
     /**
+     * Get the latest comment for a post
+     */
+    public function getLastComment($post_id) {
+        try {
+            $stmt = $this->pdo->prepare(
+                'SELECT c.id, c.post_id, c.user_id, c.content, c.created_at,
+                        u.fullname, u.username, u.profile_picture
+                 FROM comments c
+                 JOIN users u ON c.user_id = u.id
+                 WHERE c.post_id = ?
+                 ORDER BY c.created_at DESC, c.id DESC
+                 LIMIT 1'
+            );
+            $stmt->execute([$post_id]);
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+
+    /**
      * Delete comment (only by owner)
      */
     public function deleteComment($comment_id, $user_id) {
