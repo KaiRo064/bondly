@@ -1,8 +1,6 @@
 <?php
 /**
- * Database Configuration File
- * Bondly Social Network Application
- * Using PDO with Prepared Statements
+ * Database Configu
  */
 
 // Database credentials
