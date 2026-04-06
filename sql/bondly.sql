@@ -1,6 +1,3 @@
--- Bondly Social Network Database Schema
--- Saint Michael College of Caraga (SMCC)
-
 CREATE DATABASE IF NOT EXISTS bondly;
 USE bondly;
 
